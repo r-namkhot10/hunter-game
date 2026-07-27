@@ -1,4 +1,4 @@
-    #include <iostream>
+#include <iostream>
 #include <cmath>
 
 struct Vec2 {
@@ -6,7 +6,7 @@ struct Vec2 {
 
     Vec2(float x, float y) {
         this->x = x;
-        this->y = y;
+        this->y = y; 
     }
 
     Vec2 operator+(const Vec2& other) const {
@@ -37,6 +37,19 @@ struct Vec2 {
     }
 };
 
+void moveToward(Vec2& mover, const Vec2& target, float speed) {
+    Vec2 direction = (target - mover).normalize();
+    mover = mover + direction * speed;
+}
+
+void printStatus(const Vec2& player, const Vec2& hunter, int turn) {
+    std::cout << "===== Turn " << turn << " =====\n"
+        "Player Position: (" << player.x << ", " << player.y << ")\n"
+        "Hunter Position: (" << hunter.x << ", " << hunter.y << ")\n"
+        "Distance: " << player.distanceTo(hunter) << "\n";
+}
+
+
 int main() {
     Vec2 playerPos(0.0f, 0.0f);
     Vec2 hunterPos(10.0f, 10.0f);
@@ -62,10 +75,7 @@ int main() {
                 "Hunter speed is now: " << hunterSpeed << "\n\n";
         }
 
-        std::cout << "===== Turn " << turn << " =====\n"
-            "Player Position: (" << playerPos.x << ", " << playerPos.y << ")\n"
-            "Hunter Position: (" << hunterPos.x << ", " << hunterPos.y << ")\n"
-            "Distance: " << playerPos.distanceTo(hunterPos) << "\n";
+        printStatus(playerPos, hunterPos, turn);
 
         char input;
         std::cin >> input;
@@ -90,8 +100,7 @@ int main() {
             break;
         }
 
-        Vec2 direction = (playerPos - hunterPos).normalize();
-        hunterPos = hunterPos + direction * hunterSpeed;
+        moveToward(hunterPos, playerPos, hunterSpeed);
 
         if (playerPos.distanceTo(hunterPos) < 1) {
             std::cout << "\n*** GAME OVER ***\n"
