@@ -1,24 +1,29 @@
 # HUNTER
 
-A console chase game written in C++. Evade a hunter that tracks you with
+A console chase game written in C++. Evade hunters that tracks you with
 real-time seek AI — survive 20 turns to win.
 
 ## Features
-- **Seek AI** — the hunter recalculates its direction toward the player
+- **Seek AI** — hunters recalculates their direction toward the player
   every turn using vector math
-- **Difficulty scaling** — the hunter gets faster every 10 turns
-- **Win/lose conditions** — survive 20 turns to win; if the hunter gets
+- **Difficulty scaling** — the hunters get faster every 10 turns
+- **Win/lose conditions** — survive 20 turns to win; if any hunter gets
   within distance 1, you're caught
 - Turn-based movement on a 2D coordinate plane
+- Two hunters spawn at opposite corners and pursue simultaneously
 
 ## How to Run
 Requires a C++17 compiler.
 
-**Visual Studio:** open the project and press `Ctrl+F5`
+**MSVC (Developer PowerShell):**
+```
+cl main.cpp /EHsc /std:c++17 /Fe:hunter.exe
+.\hunter.exe
+```
 
 **g++:**
 ```
-g++ -std=c++17 hunter-game.cpp -o hunter
+g++ -std=c++17 main.cpp -o hunter
 ./hunter
 ```
 
@@ -33,11 +38,10 @@ Type one key and press Enter:
 | `d` | move right |
 | `q` | quit |
 
-Each turn shows your position, the hunter's position, and the distance
+Each turn shows your position, each hunter' position, and the distance
 between you.
 
-**Tip:** running blindly gets you caught — run *away* from the hunter's
-spawn point, not across its path.
+**Tip:** running blindly gets you caught — run *away* from the hunters' spawn points, not across their paths.
 
 ## Technical Highlights
 - **Custom `Vec2` math struct** with operator overloading (`+`, `-`, `*`),
@@ -45,6 +49,8 @@ spawn point, not across its path.
 - **Const-correct methods** — every read-only operation is marked `const`
 - **Seek behavior** in one line:
   `hunterPos = hunterPos + (playerPos - hunterPos).normalize() * hunterSpeed;`
+- **Multiple enemies via `std::vector<Vec2>`** — the hunter loop scales to
+  any number of pursuers without changing the AI code
 - **Code reuse (DRY)** — refactored `distanceTo()` to build on the existing
   `operator-` instead of duplicating the math:
 

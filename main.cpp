@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cmath>
+#include <vector>
 
 struct Vec2 {
     float x, y;
@@ -42,28 +43,33 @@ void moveToward(Vec2& mover, const Vec2& target, float speed) {
     mover = mover + direction * speed;
 }
 
-void printStatus(const Vec2& player, const Vec2& hunter, int turn) {
+void printStatus(const Vec2& player, const std::vector<Vec2>& hunters, int turn) {
     std::cout << "===== Turn " << turn << " =====\n"
-        "Player Position: (" << player.x << ", " << player.y << ")\n"
-        "Hunter Position: (" << hunter.x << ", " << hunter.y << ")\n"
-        "Distance: " << player.distanceTo(hunter) << "\n";
+        "Player Position: (" << player.x << ", " << player.y << ")\n";
+    for (int i = 0; i < hunters.size(); i++) {
+        std::cout << "Hunter " << (i + 1) << " Position: (" << hunters[i].x << ", " << hunters[i].y << ")\n"
+        "Distance: " << player.distanceTo(hunters[i]) << "\n";
+    }
 }
-
 
 int main() {
     Vec2 playerPos(0.0f, 0.0f);
-    Vec2 hunterPos(10.0f, 10.0f);
+
+    std::vector<Vec2> hunters;
+    hunters.push_back(Vec2(10.0f, 10.0f));
+    hunters.push_back(Vec2(-10.0f, 10.0f));
+
     float hunterSpeed = 0.8f;
     int turn = 0;
 
     std::cout << "Welcome to the Hunter Game!\n"
-         "Your goal is to avoid the hunter for as long as possible.\n"
-         "The hunter will move towards you each turn.\n"
+         "Your goal is to avoid the hunters for as long as possible.\n"
+         "The hunters will move towards you each turn.\n"
          "You can move in four directions: up, down, left, and right.\n"
-         "The game ends when the hunter catches you.\n\n"
+         "The game ends when a hunter catches you.\n\n"
          "***How to Play***\n"
          "Controls: w = up, a = left, s = down, d = right, q = quit\n"
-         "Player starts at (0, 0), Hunter starts at (10, 10)\n"
+         "Player starts at (0, 0), Two hunters start at (10, 10) and (-10, 10)\n"
          "Good luck!\n\n";
 
     while (true) {
@@ -71,11 +77,13 @@ int main() {
 
         if (turn % 10 == 0) {
             hunterSpeed += 0.5f;
-            std::cout << "\n*** The hunter is getting faster! ***\n"
+            std::cout << "\n*** The hunters are getting faster! ***\n"
                 "Hunter speed is now: " << hunterSpeed << "\n\n";
         }
 
-        printStatus(playerPos, hunterPos, turn);
+        
+        printStatus(playerPos, hunters, turn);
+        
 
         char input;
         std::cin >> input;
@@ -99,10 +107,20 @@ int main() {
         else if (input == 'q') {
             break;
         }
+        
+        for (int i = 0; i < hunters.size(); i++) {
+            moveToward(hunters[i], playerPos, hunterSpeed);
+        }
 
-        moveToward(hunterPos, playerPos, hunterSpeed);
+        bool caught = false;
 
-        if (playerPos.distanceTo(hunterPos) < 1) {
+        for (Vec2& hunterPos : hunters) {
+            if (playerPos.distanceTo(hunterPos) < 1) {
+                caught = true;
+            }
+        }
+
+        if (caught) {
             std::cout << "\n*** GAME OVER ***\n"
                 "You survived " << turn << " turns!\n\n"
                 "*** Hunter caught you at ("
@@ -110,7 +128,7 @@ int main() {
             break;
         }
 
-        else if (turn == 20) {
+        if (turn == 20) {
             std::cout << "\n*** YOU WIN! ***\n"
                 "You survived 20 turns!\n\n";
             break;
